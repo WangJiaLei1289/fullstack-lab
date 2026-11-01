@@ -1,0 +1,174 @@
+name: 从 CHANGELOG 打标签并发布
+
+# 每次推送到 main 之后运行。如果本次推送的提交范围内（与推送的 `before` SHA
+# 相比）CHANGELOG.md 在任意位置新增了 ## vX.Y.Z 标题：
+#   1. 先做发布把关——.claude-plugin/marketplace.json 中的版本必须
+#      与新标题一致，并且校验器 + 测试套件必须通过
+#      （测试套件还会断言每个 plugin.json 携带相同版本），然后
+#   2. 在被推送的提交上创建一个以该版本号命名的轻量标签，并
+#   3. 为该标签发布 GitHub Release，说明取自 CHANGELOG 中匹配的
+#      章节。
+#
+# CHANGELOG 是事实来源；标签与 Release 都是它的确定性投影。
+# 改编自 phuryn/claude-usage 的 tag-on-merge 工作流，
+# 去掉了 .vsix 构建。标签已存在的标题会被视为
+# 补录的历史并跳过，因此导入旧的发布是安全的。
+#
+# 当 CHANGELOG 未被改动、或只是编辑（而非新增）了已有的版本标题、
+# 或标签/Release 已存在时，不执行任何操作。在 force-push 与 amend
+# 之后也可以安全重跑。
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          # 需要足够的历史来 diff 整个推送范围（`before..after`），
+          # 而不只是最新提交。仓库很小，完整克隆成本很低。
+          fetch-depth: 0
+
+      - name: 检测 CHANGELOG 中新增的版本标题
+        id: detect
+        env:
+          BEFORE: ${{ github.event.before }}
+          AFTER:  ${{ github.sha }}
+        run: |
+          set -euo pipefail
+
+          # 在全新的分支上（首次推送），before 全是 0。
+          zeros="0000000000000000000000000000000000000000"
+          if [ "$BEFORE" = "$zeros" ] || [ -z "$BEFORE" ]; then
+            echo "version=" >> "$GITHUB_OUTPUT"
+            echo "Brand-new branch push; nothing to compare."
+            exit 0
+          fi
+
+          # 整个推送范围内 CHANGELOG.md 新增的、
+          # 看起来像版本标题的行。格式：`## vX.Y.Z`（需要三段式
+          # semver）。末尾的边界分组可避免 `## v2.1.0a` 被当作
+          # `v2.1.0` 匹配。
+          added_versions=$(git diff "$BEFORE..$AFTER" -- CHANGELOG.md \
+            | grep -E '^\+## v[0-9]+\.[0-9]+\.[0-9]+([[:space:]]|$)' \
+            | sed -E 's/^\+## (v[0-9]+\.[0-9]+\.[0-9]+)([[:space:]]|$).*/\1/' \
+            || true)
+
+          if [ -z "$added_versions" ]; then
+            echo "version=" >> "$GITHUB_OUTPUT"
+            echo "No new ## vX.Y.Z heading added to CHANGELOG; nothing to tag."
+            exit 0
+          fi
+
+          # 标签在 origin 上已存在的标题属于补录的历史，
+          # 不是新发布——跳过它们。
+          new_versions=""
+          for v in $added_versions; do
+            if git ls-remote --tags origin "refs/tags/$v" | grep -q .; then
+              echo "$v is already tagged; treating as backfill."
+            else
+              new_versions="${new_versions}${v}"$'\n'
+            fi
+          done
+          new_versions=$(printf '%s' "$new_versions" | sed '/^$/d')
+
+          if [ -z "$new_versions" ]; then
+            echo "version=" >> "$GITHUB_OUTPUT"
+            echo "All added headings are already tagged (backfill); nothing to do."
+            exit 0
+          fi
+
+          # 如果一次推送里新增了多个未打标签的标题，就大声失败——
+          # 因为无法确定该打哪一个，而一次合并发布两个版本
+          # 几乎肯定不是本意。
+          count=$(echo "$new_versions" | wc -l)
+          if [ "$count" -gt 1 ]; then
+            echo "::error::Multiple new untagged version headings detected; refusing to auto-tag. Versions: $new_versions"
+            exit 1
+          fi
+
+          version=$(echo "$new_versions" | head -1)
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "Detected new release: $version"
+
+      # ── 发布把关 ──────────────────────────────────────────────────────────
+      # 以下所有步骤都以检测到新版本为前提，因此推送到 main 的普通
+      # 推送（文档、错别字修复）不会产生任何环境准备或测试开销。
+
+      - name: "把关：marketplace.json 版本与 CHANGELOG 一致"
+        if: steps.detect.outputs.version != ''
+        env:
+          VERSION: ${{ steps.detect.outputs.version }}
+        run: |
+          set -euo pipefail
+          want="${VERSION#v}"
+          have=$(python3 -c "import json; print(json.load(open('.claude-plugin/marketplace.json'))['version'])")
+          if [ "$have" != "$want" ]; then
+            echo "::error::marketplace.json is $have but CHANGELOG released $VERSION. Bump the manifests before the release push."
+            exit 1
+          fi
+          echo "marketplace.json at $have."
+
+      - name: "把关：校验器 + 测试套件"
+        if: steps.detect.outputs.version != ''
+        run: |
+          set -euo pipefail
+          python3 validate_plugins.py
+          python3 -m unittest discover -s tests -v
+
+      - name: 若标签尚不存在则创建并推送
+        if: steps.detect.outputs.version != ''
+        env:
+          VERSION: ${{ steps.detect.outputs.version }}
+        run: |
+          set -euo pipefail
+
+          # 标签可能已经存在——有人在工作流跟上之前手动打过标签，
+          # 或同一提交被重新推送。操作是幂等的。
+          if git ls-remote --tags origin "refs/tags/$VERSION" | grep -q .; then
+            echo "Tag $VERSION already exists on origin; nothing to do."
+            exit 0
+          fi
+
+          git tag "$VERSION"
+          git push origin "$VERSION"
+          echo "Tagged $VERSION at $(git rev-parse HEAD)."
+
+      - name: 以 CHANGELOG 章节作为说明创建 GitHub Release
+        if: steps.detect.outputs.version != ''
+        env:
+          VERSION: ${{ steps.detect.outputs.version }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          # 幂等：重新推送同一个发布提交不会报错。
+          if gh release view "$VERSION" >/dev/null 2>&1; then
+            echo "Release $VERSION already exists; nothing to do."
+            exit 0
+          fi
+
+          # 提取该版本的 CHANGELOG 章节（从标题一直到下一个 `## vX` 标题
+          # 之前的那一行）作为发布说明。$2 是版本号标记：
+          # `## v2.1.0 — 2026-07-03` → $2 == "v2.1.0"。
+          notes="$(mktemp)"
+          awk -v ver="$VERSION" '
+            /^## v[0-9]/ { if (started) exit; if ($2 == ver) started=1 }
+            started { print }
+          ' CHANGELOG.md > "$notes"
+          if [ ! -s "$notes" ]; then
+            echo "::error::No '## $VERSION' section found in CHANGELOG.md."
+            exit 1
+          fi
+
+          gh release create "$VERSION" \
+            --title "$VERSION" \
+            --notes-file "$notes"
+          echo "Released $VERSION."

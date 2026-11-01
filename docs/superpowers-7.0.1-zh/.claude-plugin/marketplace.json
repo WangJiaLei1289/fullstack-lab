@@ -1,0 +1,20 @@
+{
+  "name": "superpowers-dev",
+  "description": "Superpowers 核心技能库的开发用插件市场",
+  "owner": {
+    "name": "Jesse Vincent",
+    "email": "jesse@fsck.com"
+  },
+  "plugins": [
+    {
+      "name": "superpowers",
+      "description": "面向 Claude Code 的核心技能库：TDD、调试、协作模式与经过验证的技巧",
+      "version": "7.0.1",
+      "source": "./",
+      "author": {
+        "name": "Jesse Vincent",
+        "email": "jesse@fsck.com"
+      }
+    }
+  ]
+}

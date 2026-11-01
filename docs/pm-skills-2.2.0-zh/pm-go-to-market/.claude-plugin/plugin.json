@@ -1,0 +1,20 @@
+{
+  "name": "pm-go-to-market",
+  "version": "2.2.0",
+  "description": "面向产品经理的上市（GTM）技能：GTM 战略、增长循环、GTM 打法、滩头细分市场与理想客户画像。",
+  "author": {
+    "name": "Paweł Huryn",
+    "email": "pawel@productcompass.pm",
+    "url": "https://www.productcompass.pm"
+  },
+  "keywords": [
+    "product-management",
+    "go-to-market",
+    "gtm",
+    "growth-loops",
+    "icp",
+    "launch"
+  ],
+  "homepage": "https://www.productcompass.pm",
+  "license": "MIT"
+}

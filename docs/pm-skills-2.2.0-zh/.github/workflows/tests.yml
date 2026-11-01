@@ -1,0 +1,28 @@
+name: 测试
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.13"]
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: 安装 Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: 插件校验器
+        run: python validate_plugins.py
+
+      - name: 单元测试与一致性测试
+        run: python -m unittest discover -s tests -v

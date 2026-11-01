@@ -1,0 +1,23 @@
+{
+  "name": "pm-ai-shipping",
+  "version": "2.2.0",
+  "description": "AI 交付套件——面向对 AI 生成的代码负责的产品经理和创始人。为 vibe-coded（用自然语言让 AI 直接写出代码）应用编写文档，评审其在正确性、安全和性能方面的缺陷，并产出一份可供评审者直接使用的交付包。",
+  "author": {
+    "name": "Paweł Huryn",
+    "email": "pawel@productcompass.pm",
+    "url": "https://www.productcompass.pm"
+  },
+  "keywords": [
+    "product-management",
+    "ai-shipping",
+    "vibe-coding",
+    "security-audit",
+    "performance-audit",
+    "code-review",
+    "documentation",
+    "owasp",
+    "shipping"
+  ],
+  "homepage": "https://www.productcompass.pm",
+  "license": "MIT"
+}

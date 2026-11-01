@@ -1,0 +1,23 @@
+# Generated SRS output
+docs/
+
+# Project context directories (created by init_project.py — project-specific)
+projects/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Claude Code session data (not part of the skill package)
+.claude/session-data/
+.claude/artifacts/
+
+# Temp
+*.tmp
+*.log

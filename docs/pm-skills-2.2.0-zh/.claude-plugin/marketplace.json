@@ -1,0 +1,67 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "pm-skills",
+  "version": "2.2.0",
+  "description": "为更好的产品决策打造的结构化 AI 工作流。覆盖 69 个领域专属技能与 42 条链式工作流、9 个 PM 插件（69 domain-specific skills and 42 chained workflows across 9 PM plugins）——从产品发现到战略、执行、上市、增长，以及交付由 AI 构建的软件。",
+  "owner": {
+    "name": "Paweł Huryn",
+    "email": "pawel@productcompass.pm",
+    "url": "https://www.productcompass.pm"
+  },
+  "plugins": [
+    {
+      "name": "pm-product-discovery",
+      "description": "面向产品经理的产品发现技能：构思、实验、假设验证、功能优先级排序，以及客户访谈综合。",
+      "source": "./pm-product-discovery",
+      "category": "product-management"
+    },
+    {
+      "name": "pm-product-strategy",
+      "description": "面向产品经理的产品战略技能：愿景、战略画布、价值主张、精益画布、商业模式画布、SWOT、PESTLE、安索夫矩阵、波特五力模型，以及变现。",
+      "source": "./pm-product-strategy",
+      "category": "product-management"
+    },
+    {
+      "name": "pm-execution",
+      "description": "执行与产品管理技能：PRD、OKR、路线图、冲刺、事前验尸、利益相关方地图、用户故事、优先级框架等。",
+      "source": "./pm-execution",
+      "category": "product-management"
+    },
+    {
+      "name": "pm-market-research",
+      "description": "面向产品经理的市场研究技能：用户画像、市场细分、情感分析与竞品分析。",
+      "source": "./pm-market-research",
+      "category": "product-management"
+    },
+    {
+      "name": "pm-data-analytics",
+      "description": "面向产品经理的数据分析技能：SQL 查询生成与同期群分析。分析用户数据、生成查询，并识别留存模式。",
+      "source": "./pm-data-analytics",
+      "category": "product-management"
+    },
+    {
+      "name": "pm-go-to-market",
+      "description": "面向产品经理的上市策略技能：GTM 战略、增长循环、GTM 打法、滩头细分市场与理想客户画像。",
+      "source": "./pm-go-to-market",
+      "category": "product-management"
+    },
+    {
+      "name": "pm-marketing-growth",
+      "description": "产品营销与增长技能：营销创意、价值主张陈述、北极星指标、产品命名与定位。",
+      "source": "./pm-marketing-growth",
+      "category": "product-management"
+    },
+    {
+      "name": "pm-toolkit",
+      "description": "产品经理实用技能：简历评审、NDA 起草、隐私政策生成，以及语法与行文检查。核心产品工作之外产品经理的必备工具。",
+      "source": "./pm-toolkit",
+      "category": "product-management"
+    },
+    {
+      "name": "pm-ai-shipping",
+      "description": "AI Shipping Kit —— 面向对 AI 生成代码负责的产品经理与创始人。为 vibe-coded 应用写文档，评审其正确性、安全与性能缺陷，并产出一份评审者可直接使用的交付包。",
+      "source": "./pm-ai-shipping",
+      "category": "product-management"
+    }
+  ]
+}

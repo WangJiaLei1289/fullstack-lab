@@ -1,0 +1,20 @@
+{
+  "name": "pm-toolkit",
+  "version": "2.2.0",
+  "description": "PM 实用技能：简历评审、NDA 起草、隐私政策生成，以及语法与行文检查。产品经理在核心产品工作之外必备的工具。",
+  "author": {
+    "name": "Paweł Huryn",
+    "email": "pawel@productcompass.pm",
+    "url": "https://www.productcompass.pm"
+  },
+  "keywords": [
+    "product-management",
+    "resume",
+    "legal",
+    "nda",
+    "privacy-policy",
+    "copywriting"
+  ],
+  "homepage": "https://www.productcompass.pm",
+  "license": "MIT"
+}

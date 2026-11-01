@@ -1,0 +1,19 @@
+{
+  "name": "pm-data-analytics",
+  "version": "2.2.0",
+  "description": "面向产品经理的数据分析技能：SQL 查询生成与同期群分析。分析用户数据、生成查询，并识别留存模式。",
+  "author": {
+    "name": "Paweł Huryn",
+    "email": "pawel@productcompass.pm",
+    "url": "https://www.productcompass.pm"
+  },
+  "keywords": [
+    "product-management",
+    "data-analytics",
+    "sql",
+    "cohort-analysis",
+    "retention"
+  ],
+  "homepage": "https://www.productcompass.pm",
+  "license": "MIT"
+}

@@ -1,0 +1,22 @@
+{
+  "name": "superpowers",
+  "version": "7.0.1",
+  "description": "一套确实可行的代理技能框架与软件开发方法论：规划、TDD、调试与协作工作流。",
+  "author": {
+    "name": "Jesse Vincent",
+    "email": "jesse@fsck.com"
+  },
+  "homepage": "https://github.com/obra/superpowers",
+  "repository": "https://github.com/obra/superpowers",
+  "license": "MIT",
+  "keywords": [
+    "brainstorming",
+    "subagent-driven-development",
+    "skills",
+    "planning",
+    "tdd",
+    "debugging",
+    "code-review",
+    "workflow"
+  ]
+}
